@@ -9,7 +9,62 @@
 <body>
     <div class="container">
         <h1>Free Movies This Month</h1>
-        <div class="movies-grid">
+        
+        <!-- Search Form -->
+        <div class="search-section">
+            <h2>🔍 Search Movies</h2>
+            <form class="search-form" action="/movies/search" method="get">
+                <div class="search-inputs">
+                    <div class="input-group">
+                        <label for="name">Movie Name:</label>
+                        <input type="text" id="name" name="name" placeholder="Enter movie name..." 
+                               th:value="${searchName}" />
+                    </div>
+                    <div class="input-group">
+                        <label for="genre">Genre:</label>
+                        <input type="text" id="genre" name="genre" placeholder="Enter genre..." 
+                               th:value="${searchGenre}" />
+                    </div>
+                    <div class="input-group">
+                        <label for="id">Movie ID:</label>
+                        <input type="number" id="id" name="id" placeholder="Enter movie ID..." 
+                               th:value="${searchId}" min="1" />
+                    </div>
+                </div>
+                <div class="search-buttons">
+                    <button type="submit" class="search-btn">🎬 Search Movies</button>
+                    <button type="button" class="clear-btn" onclick="clearSearch()">🗑️ Clear</button>
+                    <a href="/movies" class="show-all-btn">📋 Show All Movies</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Results Info -->
+        <div class="search-results-info" th:if="${isSearchResult}">
+            <div class="results-header">
+                <h3 th:if="${searchResultCount > 0}" 
+                    th:text="'🎯 Found ' + ${searchResultCount} + ' movie(s) matching your search'">
+                    Search Results
+                </h3>
+                <h3 th:if="${searchResultCount == 0}" class="no-results">
+                    🏴‍☠️ Ahoy! No movies found matching your search criteria, matey!
+                </h3>
+            </div>
+            <div class="search-criteria" th:if="${searchResultCount > 0}">
+                <span th:if="${not #strings.isEmpty(searchName)}" class="criteria-item">
+                    Name: "<span th:text="${searchName}"></span>"
+                </span>
+                <span th:if="${not #strings.isEmpty(searchGenre)}" class="criteria-item">
+                    Genre: "<span th:text="${searchGenre}"></span>"
+                </span>
+                <span th:if="${not #strings.isEmpty(searchId)}" class="criteria-item">
+                    ID: <span th:text="${searchId}"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Movies Grid -->
+        <div class="movies-grid" th:if="${not #lists.isEmpty(movies)}">
             <div class="movie-card" th:each="movie : ${movies}">
                 <div class="movie-icon" th:text="${movie.icon}">🎬</div>
                 <h3 th:text="${movie.movieName}">Movie Title</h3>
@@ -29,6 +84,31 @@
                 <a th:href="@{/movies/{id}/details(id=${movie.id})}" class="details-btn">View Details</a>
             </div>
         </div>
+
+        <!-- Empty State for No Results -->
+        <div class="empty-state" th:if="${isSearchResult and searchResultCount == 0}">
+            <div class="empty-icon">🏴‍☠️</div>
+            <h3>No Treasure Found!</h3>
+            <p>Arrr! We couldn't find any movies matching your search criteria, matey!</p>
+            <p>Try adjusting your search terms or <a href="/movies">view all movies</a>.</p>
+            <div class="search-tips">
+                <h4>Search Tips:</h4>
+                <ul>
+                    <li>🎬 Try partial movie names (e.g., "Prison" for "The Prison Escape")</li>
+                    <li>🎭 Search by genre (e.g., "Drama", "Action", "Crime")</li>
+                    <li>🔢 Use exact movie ID for precise results</li>
+                    <li>🔍 Leave fields empty to search all movies</li>
+                </ul>
+            </div>
+        </div>
     </div>
+
+    <script>
+        function clearSearch() {
+            document.getElementById('name').value = '';
+            document.getElementById('genre').value = '';
+            document.getElementById('id').value = '';
+        }
+    </script>
 </body>
 </html>
